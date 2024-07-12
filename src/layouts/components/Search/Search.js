@@ -16,7 +16,7 @@ const cx = classNames.bind(styles);
 function Search() {
     const [searchValue, setSearchValue] = useState('');
     const [searchResult, setSearchResult] = useState([]);
-    const [showResult, setShowReasult] = useState(true);
+    const [showResult, setShowReasult] = useState(false);
     //ta để showResult là true ban đầu vì muốn hiển thị search phải đủ 2 điều kiện, ở đây true thì vân chưa đủ
     const [loading, setLoading] = useState(false); // loading ban đầu là false
 
@@ -25,12 +25,12 @@ function Search() {
     //1: ''
     //2: 'h'
     //3: 'ho'
-    const debounced = useDebounce(searchValue, 500);
+    const debouncedValue = useDebounce(searchValue, 500);
     //vì searchValue thay đổi liên tục nên call api liên tục nên phải debounce search value => deps trong useEffect thay đổi
     //chỉ nhận value sau khi ngưng gõ 500ms
 
     useEffect(() => {
-        if (!debounced.trim()) {
+        if (!debouncedValue.trim()) {
             //nếu searchValue ko có giá trị thì ko chạy hàm
             //.trim() để loại bỏ dấu cách khi lần đầu tiên nhập
             setSearchResult([]); //khi ô tìm kiếm không có gì thì result là mảng rỗng => không hiện
@@ -40,7 +40,7 @@ function Search() {
         const fetchApi = async () => {
             setLoading(true); //trước khi gọi API loading là true
 
-            const resutl = await searchServices.search(debounced);
+            const resutl = await searchServices.search(debouncedValue);
 
             setSearchResult(resutl);
             setLoading(false);
@@ -51,7 +51,7 @@ function Search() {
         // request
         //     .get('users/search', {
         //         params: {
-        //             q: debounced,
+        //             q: debouncedValue,
         //             type: 'less',
         //         },
         //     })
@@ -63,7 +63,7 @@ function Search() {
         //         //gọi api ko được thì cũng set loading vê false ko hiện nữa
         //         setLoading(false);
         //     });
-    }, [debounced]);
+    }, [debouncedValue]);
 
     const handleHideResult = () => {
         //hàm xử lý khi click ra ngoài
